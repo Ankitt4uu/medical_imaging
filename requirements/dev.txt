@@ -1,0 +1,6 @@
+-r base.txt
+fastapi
+python-multipart
+httpx
+pyjwt
+pytest

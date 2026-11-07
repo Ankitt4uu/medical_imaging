@@ -1,0 +1,38 @@
+services:
+  orthanc:
+    image: jodogne/orthanc:1.12.4
+    volumes:
+      - ./orthanc.json:/etc/orthanc/orthanc.json:ro
+      - orthanc-db:/var/lib/orthanc/db
+    ports:
+      - "127.0.0.1:8042:8042"   # Orthanc Explorer, localhost only
+      - "4242:4242"             # DICOM C-STORE
+    restart: unless-stopped
+
+  backend:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    environment:
+      ORTHANC_URL: http://orthanc:8042
+      ORTHANC_USER: orthanc
+      ORTHANC_PASSWORD: change-me          # must match orthanc.json
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      USERS: ${USERS:-radiologist:radiologist,admin:admin}
+      DB_PATH: /app/state/app.db
+      RESULTS_DIR: /app/state/artifacts
+      MODELS_DIR: /app/models
+    volumes:
+      - ./models:/app/models:ro
+      - app-state:/app/state
+    depends_on: [orthanc]
+    restart: unless-stopped
+
+  frontend:
+    build: { context: frontend }
+    ports:
+      - "8080:80"
+    depends_on: [backend]
+    restart: unless-stopped
+
+volumes:
+  orthanc-db:
+  app-state:

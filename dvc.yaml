@@ -1,0 +1,18 @@
+# One-time setup:  dvc init && dvc add data/raw && dvc remote add -d storage <path-or-gdrive-url>
+stages:
+  prepare:
+    cmd: python -m medimg.preprocessing.prepare_nih --csv data/raw/sample_labels.csv --images data/raw/images --out data/processed --seed ${prepare.seed}
+    deps: [data/raw, medimg/preprocessing/prepare_nih.py]
+    params: [prepare]
+    outs: [data/processed]
+  train_cls:
+    cmd: python -m medimg.classification.train --data data/processed --arch ${train_cls.arch} --epochs ${train_cls.epochs} --freeze-epochs ${train_cls.freeze_epochs} --batch-size ${train_cls.batch_size} --lr ${train_cls.lr}
+    deps: [data/processed, medimg/classification]
+    params: [train_cls]
+    outs: [models/cls_best.pt]
+    metrics: [results/cls_train_history.json:{cache: false}]
+  eval_cls:
+    cmd: python -m medimg.classification.evaluate --data data/processed
+    deps: [models/cls_best.pt, data/processed]
+    outs: [models/cls_thresholds.json]
+    metrics: [results/cls_test_metrics.json:{cache: false}]

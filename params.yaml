@@ -1,0 +1,8 @@
+prepare:
+  seed: 42
+train_cls:
+  arch: densenet121
+  epochs: 12
+  freeze_epochs: 2
+  batch_size: 32
+  lr: 0.001

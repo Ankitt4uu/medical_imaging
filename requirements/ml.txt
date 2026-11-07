@@ -1,0 +1,5 @@
+-r base.txt
+torch
+torchvision
+monai[nibabel]>=1.3
+dvc

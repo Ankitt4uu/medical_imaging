@@ -1,0 +1,5 @@
+numpy
+pillow
+pydicom>=2.4,<3
+nibabel
+scikit-learn

@@ -1,0 +1,7 @@
+-r base.txt
+fastapi
+uvicorn[standard]
+python-multipart
+httpx
+pyjwt
+monai>=1.3
